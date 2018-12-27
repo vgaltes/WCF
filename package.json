@@ -1,0 +1,28 @@
+{
+  "name": "pufouniversity",
+  "version": "1.0.0",
+  "description": "Un pufo de universidad",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage --config=unitTestsJestConfig.json",
+    "lint": "eslint \"./**/*.js\" --fix",
+    "test:acceptance": "jest ./test/acceptance/**/*.js",
+    "pretest": "npm run lint",
+    "posttest": "npm audit",
+    "deploy": "serverless deploy --aws-profile serverless-local"
+  },
+  "author": "Vicenc Garcia Altes",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^5.6.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-prettier": "^3.0.0",
+    "eslint-plugin-react": "^7.11.1",
+    "jest": "^23.6.0",
+    "prettier": "^1.14.3",
+    "serverless": "^1.35.1"
+  }
+}

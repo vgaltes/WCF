@@ -1,0 +1,5 @@
+{
+  "testPathIgnorePatterns": [
+    "<rootDir>/test/acceptance/"
+  ]
+}
