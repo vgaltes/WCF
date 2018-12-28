@@ -9,11 +9,12 @@ Vamos a utilizar AWS Lambda, así que necesitas tener una cuenta en AWS. No te p
 
 Vamos a necesitar un par de usuarios en tu cuenta para el workshop. Uno será el que utilizaremos en local para desplegar y probar la aplicación. El segundo será el que utilizará nuestro sistema de integración contínua para desplegar y probar la aplicación. Vamos a por ello: repite los siguientes pasos dos veces (una por usuario) con diferentes nombres de usuario.
  - Haz login en tu cuenta de AWS y ve a la página Identity & Access Management (IAM)
- - Haz click en Users y después en Add User. Introduce serverless-local como nombre para el primer usuario y serverless-agent como nombre para el segundo usuario. Activa Programmatic Access. Haz click en Next para ir a la página de permisos. Haz click en Attach existing policies directly y después en Create policy. Selecciona el tab JSON, y copia allí el contenido de este [gist](https://gist.github.com/ServerlessBot/7618156b8671840a539f405dea2704c8).
- - Selecciona Review policy. Asígnale el nombre MinimumServerlessPermissions. Puedes asignarle también una descripción. 
- - Vuelve a la pantalla de creación del usuario, actualiza el listado de policies y selecciona la policy que acabamos de crear. Clica en Next: tags. 
+ - Haz click en Users y después en Add User. Introduce serverless-local como nombre para el primer usuario y serverless-agent como nombre para el segundo usuario. Activa Programmatic Access. Haz click en Next para ir a la página de permisos. Haz click en Add user to group y selecciona el grupo Administrators.
+ - Clica en Next: tags. 
  - Clica en Next: review. Chequea que todo está bien y clica en Create user. 
  - Visualiza y copia la API Key y el Secret a un lugar temporal. Lo necesitaremos más tarde.
+
+Esto no es una buena práctica. La buena práctica sería dar los mínimos permisos posibles a este usuario (y a todos). Para hacerlo, crearíamos una policy en la que especificaríamos los mínimos permisos (algo como lo que puedes encontrar [aqui](https://gist.githubusercontent.com/ServerlessBot/7618156b8671840a539f405dea2704c8/raw/bfc213d5b20ad0192217d5035ff526792535bdab/IAMCredentials.json)) y asiganaríamos esa policy al usurio. Cada vez que viéramos que nos falta un permiso, deberíamos cambiar la policy. Para no tener que ir haciendo esto cada dos por tres, asignamos el usuario al grupo Administrators, pero no debéis hacer esto en un proyecto en producción. Hay herramientas que nos pueden ayudar como [esta](https://www.trek10.com/blog/excess-access-exorcism-with-aws-config/) o [esta](https://github.com/dancrumb/generator-serverless-policy).
 
 ## Creación de un profile en nuestro ordenador.
 Ahora es la hora de configurar nuestro ordenador para que utilice estas credenciales a la hora de desplegar nuestra aplicación. Hay varias maneras de hacer esto pero la mejor es utilizar un profile y que este no sea el profile por defecto, para evitar posibles desgracias en el futuro.
