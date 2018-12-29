@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --coverage --config=unitTestsJestConfig.json",
     "lint": "eslint \"./**/*.js\" --fix",
-    "test:acceptance": "TEST_MODE=http TEST_BASE_URL='https://y5dv22ymxe.execute-api.eu-west-1.amazonaws.com/devmanolete/api' jest ./tests/*",
+    "test:acceptance": "TEST_MODE=http jest ./tests/*",
     "test:integration": "TEST_MODE=handler ./node_modules/.bin/jest ./tests/*",
     "pretest": "npm run lint",
     "posttest": "npm audit",
