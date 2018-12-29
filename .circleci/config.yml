@@ -21,7 +21,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
       - run:
           name: Deploy application to sit
-          command: sls deploy:sit
+          command: npm run deploy:sit
       - run:
           name: Recreate database
           command: node seedMasters.js masters-sit
@@ -33,4 +33,4 @@ jobs:
           command: npm run test:acceptance
       - run:
           name: Deploy application
-          command: sls deploy:prod
+          command: npm run deploy:prod
