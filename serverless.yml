@@ -1,4 +1,8 @@
 service: pufouniversity
+
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-iam-roles-per-function
  
 provider:
   name: aws
@@ -9,11 +13,32 @@ provider:
 custom:
   defaultRegion: eu-west-1
   stage: ${opt:stage, self:provider.stage}
+  mastersTable: masters-${self:custom.stage}
  
 functions:
-  initialTest:
-    handler: src/functions/initialTest.handler
+  getMasters:
+    handler: src/functions/getMasters.handler
     events:
       - http:
-          path: api/initialTest/{name}
+          path: api/masters
           method: get
+    environment:
+      mastersTable: ${self:custom.mastersTable}
+    iamRoleStatements:
+    - Effect: Allow
+      Action: dynamodb:scan
+      Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.mastersTable}
+
+resources:
+  Resources:
+    MastersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.mastersTable}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
