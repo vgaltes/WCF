@@ -501,7 +501,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
       - run:
           name: Deploy application to sit
-          command: sls deploy:sit
+          command: npm run deploy:sit
       - run:
           name: Recreate database
           command: node seedMasters.js masters-sit
@@ -513,7 +513,7 @@ jobs:
           command: npm run test:acceptance
       - run:
           name: Deploy application
-          command: sls deploy:prod
+          command: npm run deploy:prod
 ```
 
 Lo interesante aquí está en los diferentes run. Podrás observar que hay dos cosas que nos van a hacer cambiar un poco lo que tenemos hasta ahora. La primera es que en el paso de los tests de integración, hay una nueva variable de entorno llamada `TEST_STAGE`. Esto lo hacemos porque ahora mismo tenemos hardcodeada el nombre de la tabla a `masters-devmanolete` en el fichero `init.js`. Cuando deployemos a sit no queremos usar esa tabla sino la del entorno para no tener problemas con los permisos. Así que vamos a cambiar un poco el archivo `init.js`:
@@ -541,4 +541,12 @@ Ahora deberías llamar al test con algo parecido a esto:
 TEST_BASE_URL='https://XXXXXXXXX.execute-api.eu-west-1.amazonaws.com/devmanolete/api' npm run test:acceptance
 ```
 
-Lo que nos quedaría sería setear esa variable en la configuración de CircleCi, pero todavía no sabemos la URL porque no hemos creado el entorno. Así que, guarda todos tus cambios y haz un push para que podamos tener nuestra primera build.
+También te habrás fijado que estamos llamando a un par de scripts de npm que hasta ahora no teníamos. Edita el `package.json` y añade estos scripts:
+```
+"deploy:sit": "serverless deploy --stage sit",
+"deploy:prod": "serverless deploy --stage prod"
+```
+
+Lo que nos quedaría sería setear esa variable en la configuración de CircleCi, pero todavía no sabemos la URL porque no hemos creado el entorno. Así que, guarda todos tus cambios y haz un push para que podamos tener nuestra primera build. Verás que la build ha ido bien hasta los test de aceptación, que era lo que esperábamos. Si clicas sobre el paso de `Deploy application to sit`, al final del log te aparecerá la dirección de la API. Cópiala hasta el último segmento (hasta la palabra api, ésta incluída). Ahora clica en el botón de `Project Settings` (arriba a la derecha) y añade una nueva variable de entorno con nombre `TEST_BASE_URL` y como valor la dirección que acabas de copiar. Vuelve al workflow y clica en `Rerun workflow`.
+
+Build en verde! Hay algo más bonito que eso?
