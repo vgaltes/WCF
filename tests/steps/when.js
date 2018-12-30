@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 const http = require("superagent-promise")(require("superagent"), Promise);
 
 const mode = process.env.TEST_MODE;
@@ -25,7 +26,7 @@ async function viaHttp(functionPath, method) {
 }
 
 async function viaHandler(functionPath) {
-  // eslint-disable-next-line global-require
+  // eslint-disable-next-line import/no-dynamic-require
   const handler = require(`../../src/functions/${functionPath}`);
   const response = await handler.handler();
   response.body = JSON.parse(response.body);

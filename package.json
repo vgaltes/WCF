@@ -34,6 +34,8 @@
     "superagent-promise": "^1.1.0"
   },
   "dependencies": {
-    "aws-sdk": "^2.382.0"
+    "aws-sdk": "^2.382.0",
+    "chance": "^1.0.18",
+    "lodash": "^4.17.11"
   }
 }

@@ -14,6 +14,7 @@ custom:
   defaultRegion: eu-west-1
   stage: ${opt:stage, self:provider.stage}
   mastersTable: masters-${self:custom.stage}
+  enrollMasterEventsStream: enrollMasterEvents-${self:custom.stage}
  
 functions:
   getMasters:
@@ -29,6 +30,37 @@ functions:
       Action: dynamodb:scan
       Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.mastersTable}
 
+  enrollMaster:
+    handler: src/functions/enrollMaster.handler
+    events:
+      - http:
+          path: api/masters
+          method: post
+    environment:
+      enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
+    iamRoleStatements:
+      - Effect: Allow
+        Action: kinesis:PutRecord
+        Resource: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
+
+  notifyUniversity:
+    handler: src/functions/notifyUniversity.handler
+    events:
+      - stream:
+          arn: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
+    environment:
+      enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
+      emailAddress: xxxx@yyyy.com
+    iamRoleStatements:
+      - Effect: Allow
+        Action: 
+          - ses:SendEmail
+          - ses:SendRawEmail
+        Resource: "*"
+      - Effect: Allow
+        Action: kinesis:PutRecord
+        Resource: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
+
 resources:
   Resources:
     MastersTable:
@@ -42,3 +74,9 @@ resources:
           - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+
+    EnrollMasterEventsStream:
+      Type: AWS::Kinesis::Stream
+      Properties: 
+        Name: ${self:custom.enrollMasterEventsStream}
+        ShardCount: 1
