@@ -1,10 +1,21 @@
+/* eslint-disable import/no-unresolved */
 const AWS = require("aws-sdk");
+const epsagon = require("epsagon");
+const middy = require("middy");
+const { ssm } = require("middy/middlewares");
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const tableName = process.env.mastersTable;
+const { stage } = process.env;
 
-module.exports.handler = async () => {
+const handler = epsagon.lambdaWrapper(async (event, context) => {
   const count = 8;
+
+  epsagon.init({
+    token: context.epsagonToken,
+    appName: process.env.service,
+    metadataOnly: false
+  });
 
   const req = {
     TableName: tableName,
@@ -19,4 +30,15 @@ module.exports.handler = async () => {
   };
 
   return res;
-};
+});
+
+module.exports.handler = middy(handler).use(
+  ssm({
+    cache: true,
+    cacheExpiryInMillis: 3 * 60 * 1000,
+    setToContext: true,
+    names: {
+      epsagonToken: `/pufouniversity/${stage}/epsagonToken`
+    }
+  })
+);

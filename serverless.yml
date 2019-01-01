@@ -3,12 +3,19 @@ service: pufouniversity
 plugins:
   - serverless-pseudo-parameters
   - serverless-iam-roles-per-function
+
+package:
+  exclude:
+    - tests/**
  
 provider:
   name: aws
   runtime: nodejs8.10
   region: ${opt:region, self:custom.defaultRegion}
   stage: dev${env:SLSUSER, ""}
+  environment:
+    service: ${self:service}-${self:custom.stage}
+    stage: ${self:custom.stage}
 
 custom:
   defaultRegion: eu-west-1
@@ -26,9 +33,12 @@ functions:
     environment:
       mastersTable: ${self:custom.mastersTable}
     iamRoleStatements:
-    - Effect: Allow
-      Action: dynamodb:scan
-      Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.mastersTable}
+      - Effect: Allow
+        Action: dynamodb:scan
+        Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.mastersTable}
+      - Effect: Allow
+        Action: ssm:GetParameters*
+        Resource: arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/pufouniversity/*
 
   enrollMaster:
     handler: src/functions/enrollMaster.handler
@@ -42,6 +52,9 @@ functions:
       - Effect: Allow
         Action: kinesis:PutRecord
         Resource: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
+      - Effect: Allow
+        Action: ssm:GetParameters*
+        Resource: arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/pufouniversity/*
 
   notifyUniversity:
     handler: src/functions/notifyUniversity.handler
@@ -60,6 +73,9 @@ functions:
       - Effect: Allow
         Action: kinesis:PutRecord
         Resource: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
+      - Effect: Allow
+        Action: ssm:GetParameters*
+        Resource: arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/pufouniversity/*
 
 resources:
   Resources:

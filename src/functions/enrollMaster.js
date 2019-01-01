@@ -1,15 +1,28 @@
+/* eslint-disable import/no-unresolved */
 const AWS = require("aws-sdk");
 const chance = require("chance").Chance();
+const epsagon = require("epsagon");
+const middy = require("middy");
+const { ssm } = require("middy/middlewares");
+const log = require("../lib/log");
 
 const kinesis = new AWS.Kinesis();
 const eventStream = process.env.enrollMasterEventsStream;
+const { stage } = process.env;
 
-module.exports.handler = async event => {
+const handler = epsagon.lambdaWrapper(async (event, context) => {
+  epsagon.init({
+    token: context.epsagonToken,
+    appName: process.env.service,
+    metadataOnly: false
+  });
+
   console.log(event.body);
   const { masterId } = JSON.parse(event.body);
+  log.debug(`request body is valid JSON`, { requestBody: event.body });
 
   const orderId = chance.guid();
-  console.log(`enrolling to master ${masterId} with order ID ${orderId}`);
+  log.info("enrolling to master", { masterId, orderId });
 
   const data = {
     orderId,
@@ -25,7 +38,7 @@ module.exports.handler = async event => {
 
   await kinesis.putRecord(req).promise();
 
-  console.log(`published 'master_enrolled' event into Kinesis`);
+  log.info("published 'master_enrolled' event", { masterId, orderId });
 
   const response = {
     statusCode: 200,
@@ -33,4 +46,15 @@ module.exports.handler = async event => {
   };
 
   return response;
-};
+});
+
+module.exports.handler = middy(handler).use(
+  ssm({
+    cache: true,
+    cacheExpiryInMillis: 3 * 60 * 1000,
+    setToContext: true,
+    names: {
+      epsagonToken: `/pufouniversity/${stage}/epsagonToken`
+    }
+  })
+);

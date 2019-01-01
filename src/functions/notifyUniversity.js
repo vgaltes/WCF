@@ -1,12 +1,18 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 const AWS = require("aws-sdk");
 const _ = require("lodash");
+const epsagon = require("epsagon");
+const middy = require("middy");
+const { ssm } = require("middy/middlewares");
+const log = require("../lib/log");
 
 const ses = new AWS.SES();
 const kinesis = new AWS.Kinesis();
 const eventStream = process.env.enrollMasterEventsStream;
 const { emailAddress } = process.env;
+const { stage } = process.env;
 
 function parsePayload(record) {
   const json = Buffer.from(record.kinesis.data, "base64").toString("utf8");
@@ -37,20 +43,26 @@ function generateEmail(orderId, masterId) {
   };
 }
 
-module.exports.handler = async event => {
+const handler = epsagon.lambdaWrapper(async (event, context) => {
+  epsagon.init({
+    token: context.epsagonToken,
+    appName: process.env.service,
+    metadataOnly: false
+  });
+
   const records = getRecords(event);
-  console.log(JSON.stringify(records));
   const orderPlaced = records.filter(r => r.eventType === "master_enrolled");
+
+  log.info(`received ${orderPlaced.length} master_enrolled events`);
 
   for (const order of orderPlaced) {
     const emailParams = generateEmail(order.orderId, order.masterId);
     await ses.sendEmail(emailParams).promise();
 
-    console.log(
-      `notified universtity of order [${order.orderId}] for master [${
-      order.masterId
-      }]`
-    );
+    log.info("notified universtity", {
+      masterId: order.masterId,
+      orderId: order.orderId
+    });
 
     const data = _.clone(order);
     data.eventType = "university_notified";
@@ -62,8 +74,22 @@ module.exports.handler = async event => {
     };
 
     await kinesis.putRecord(kinesisReq).promise();
-    console.log(`published 'university_notified' event to Kinesis`);
+    log.info("published 'university_notified' event", {
+      masterId: order.masterId,
+      orderId: order.orderId
+    });
   }
 
   return "all done";
-};
+});
+
+module.exports.handler = middy(handler).use(
+  ssm({
+    cache: true,
+    cacheExpiryInMillis: 3 * 60 * 1000,
+    setToContext: true,
+    names: {
+      epsagonToken: `/pufouniversity/${stage}/epsagonTokenSecure`
+    }
+  })
+);
