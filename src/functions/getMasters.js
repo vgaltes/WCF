@@ -8,6 +8,8 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 const tableName = process.env.mastersTable;
 const { stage } = process.env;
 
+console.log(`TableName: ${tableName} | stage: ${stage}`);
+
 const handler = epsagon.lambdaWrapper(async (event, context) => {
   const count = 8;
 

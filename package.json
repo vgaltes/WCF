@@ -36,7 +36,7 @@
   "dependencies": {
     "aws-sdk": "^2.382.0",
     "chance": "^1.0.18",
-    "epsagon": "^1.7.2",
+    "epsagon": "^1.7.4",
     "lodash": "^4.17.11",
     "middy": "^0.20.0"
   }

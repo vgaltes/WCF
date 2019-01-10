@@ -28,9 +28,17 @@ async function viaHttp(functionPath, method) {
 async function viaHandler(functionPath) {
   // eslint-disable-next-line import/no-dynamic-require
   const handler = require(`../../src/functions/${functionPath}`);
-  const response = await handler.handler();
-  response.body = JSON.parse(response.body);
-  return response;
+
+  // due to https://github.com/middyjs/middy/issues/198
+  return new Promise(async (resolve, reject) => {
+    const event = {};
+    const context = {};
+    const callback = (something, response) => {
+      response.body = JSON.parse(response.body);
+      resolve(response);
+    };
+    await handler.handler(event, context, callback);
+  });
 }
 
 module.exports.we_invoke_get_masters = () =>

@@ -961,4 +961,37 @@ Ahora puedes loguear de la siguiente manera:
 log.info("published 'master_enrolled' event", { masterId, orderId });
 ```
 
+Si ahora intentas pasar los tests de integracion
+```
+AWS_PROFILE=serverless-local TEST_STAGE=devmanolete npm run test:integration
+```
+
+verás que fallan. Esto es por un pequeño [bug](https://github.com/middyjs/middy/issues/198) en middy. Para solventarlo, tendrás que cambiar ligeramente el fichero `when.js`. La función `viaHandler` te debería de quedar así:
+```
+async function viaHandler(functionPath) {
+  // eslint-disable-next-line import/no-dynamic-require
+  const handler = require(`../../src/functions/${functionPath}`);
+
+  // due to https://github.com/middyjs/middy/issues/198
+  return new Promise(async (resolve, reject) => {
+    const event = {};
+    const context = {};
+    const callback = (something, response) => {
+      response.body = JSON.parse(response.body);
+      resolve(response);
+    };
+    await handler.handler(event, context, callback);
+  });
+}
+```
+
+Esto es porque middy intenta llamar al callback (esto se utilizaba en funciones con node 6) en lugar de devolver la respuesta.
+
+Otra cosa que deberemos hacer es añadir esta línea a la función init del fichero `init.js`:
+```
+process.env.stage = process.env.TEST_STAGE;
+```
+
+Vuelve a pasar los tests y verás que ahora pasan correctamente.
+
 Y ya hemos acabado!
