@@ -24,7 +24,7 @@ custom:
   enrollMasterEventsStream: enrollMasterEvents-${self:custom.stage}
   defaultVarsStage: dev-user
   vars: ${file(./vars.yml):${opt:stage, self:custom.defaultVarsStage}}
-  userPoolId: ${env:userPoolId, self:custom.vars.userPoolId}
+  userPoolId: ${env:cognitoUserPoolId, self:custom.vars.userPoolId}
  
 functions:
   getMasters:
