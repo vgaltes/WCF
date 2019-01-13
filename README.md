@@ -1339,10 +1339,10 @@ events:
       path: api/master/{id}
       method: get
       authorizer:
-        arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.userPoolId}
+        arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
 ```
 
-Sólo nos queda cargar correctamente la variable userPoolId. Crea un archivo llamado `vars.yml` en la raiz de tu proyecto (y añádelo al .gitignore) con este contenido:
+Sólo nos queda cargar correctamente la variable userPoolId. Crea un archivo llamado `vars.yml` en la raiz de tu proyecto con este contenido:
 ```
 dev-user:
   userPoolId: "eu-west-1_VTdZAauUw"
@@ -1352,11 +1352,10 @@ prod:
   userPoolId: ""
 ```
 
-De momento nos vamos a centrar en nuestro entorno local y ya haremos pasar la build completa al final. Ahora edita la sección custom del fichero `serverless.yml` y añádele estas tres líneas:
+De momento nos vamos a centrar en nuestro entorno local y ya haremos pasar la build completa al final. Ahora edita la sección custom del fichero `serverless.yml` y añádele estas dos líneas:
 ```
 defaultVarsStage: dev-user
 vars: ${file(./vars.yml):${opt:stage, self:custom.defaultVarsStage}}
-userPoolId: ${env:userPoolId, self:custom.vars.userPoolId}
 ```
 
 Básicamente, estamos cargando el fichero y después estamos definiendo una variable que cojerá el valor de la variable de entorno y, en caso de no existir, lo cojerá del fichero.
@@ -1393,4 +1392,8 @@ async function viaHttp(functionPath, method, idToken) {
 
 Como ves, estamos añadiendo la cabezera de autorización. Vuelve a pasar los tests... y tachán!! Tests en verde! Es hora de hacer un push y mirar como va nuestra build.
 
-La build falla pq el arn que estamos pasando como authorizer no es correcto. Y no es correcto pq la variable userPoolId no está seteada. Aqui tenemos una pequeña "referencia circular", ya que no podremos setearla hasta que no deployemos, y no podemos deployar pq no está setada. Vamos a hacer un poco de trampa (solo un poco) y vamos a crear una variable de entorno llamada `cognitoUserPoolId` con el valor de la user pool de nuestro entorno de pruebas (el que tenemos en el fichero vars.yml).
+La build falla pq el arn que estamos pasando como authorizer no es correcto. Y no es correcto pq la variable userPoolId no está seteada. Aqui tenemos una pequeña "referencia circular", ya que no podremos setearla hasta que no deployemos, y no podemos deployar pq no está setada. Vamos a hacer un poco de trampa (solo un poco) y vamos a copiar el valor de la variable en dev-user a sit en el fichero `vars.yml`. Hacemos commit y push y miramos como va la build. En este caso fallará porque, si te acuerdas, en los tests de integración estamos utilizando un par de variables de entorno que no estamos seteando (`cognitoUserPoolId` y `cognitoServerClientId`). Vamos a CircleCI y seteamos estas variables de entorno con los valores del entorno sit y volvemos a correr la build. 
+
+Esta vez la build tendría que llegar hasta el deployment a producción, que fallará por la misma razón que antes. Así que hacemos lo mismo, actualizamos en el fichero `vars.yml` la variable userPoolId del entorno de producción con el valor del entorno de sit, comiteamos y pusheamos, esto hará que se cree la user pool de producción y volvemos a actualizar el contenido de nuestro fichero `vars.yml`. Volvemos a comitear y pushear y debería estar toda la pipeline en verde.
+
+Nos vamos acercando al final!! El próximo paso será añadir una sencilla UI a nuestro proyecto.
