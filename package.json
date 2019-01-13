@@ -18,6 +18,7 @@
   "author": "Vicenc Garcia Altes",
   "license": "MIT",
   "devDependencies": {
+    "dotenv": "^6.2.0",
     "eslint": "^5.6.1",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^3.1.0",

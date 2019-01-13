@@ -67,3 +67,5 @@ typings/
 .vscode
 
 secrets.yml
+.env
+vars.yml

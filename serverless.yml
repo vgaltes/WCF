@@ -22,6 +22,9 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   mastersTable: masters-${self:custom.stage}
   enrollMasterEventsStream: enrollMasterEvents-${self:custom.stage}
+  defaultVarsStage: dev-user
+  vars: ${file(./vars.yml):${opt:stage, self:custom.defaultVarsStage}}
+  userPoolId: ${self:custom.vars.userPoolId, env:userPoolId}
  
 functions:
   getMasters:
@@ -39,6 +42,24 @@ functions:
       - Effect: Allow
         Action: ssm:GetParameters*
         Resource: arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/pufouniversity/*
+  
+  getMasterDetails:
+    handler: src/functions/getMaster.handler
+    events:
+      - http:
+          path: api/master/{id}
+          method: get
+          authorizer:
+            arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.userPoolId}
+    environment:
+      mastersTable: ${self:custom.mastersTable}
+    iamRoleStatements:
+      - Effect: Allow
+        Action: dynamodb:query
+        Resource: arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.mastersTable}
+      - Effect: Allow
+        Action: ssm:GetParameters*
+        Resource: arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/pufouniversity/*
 
   enrollMaster:
     handler: src/functions/enrollMaster.handler
@@ -46,6 +67,8 @@ functions:
       - http:
           path: api/masters
           method: post
+          # authorizer:
+          #   arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
     environment:
       enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
     iamRoleStatements:
@@ -78,21 +101,6 @@ functions:
         Resource: arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/pufouniversity/*
 
 resources:
-  Resources:
-    MastersTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.mastersTable}
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: N
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
-
-    EnrollMasterEventsStream:
-      Type: AWS::Kinesis::Stream
-      Properties: 
-        Name: ${self:custom.enrollMasterEventsStream}
-        ShardCount: 1
+  - ${file(resources/masters-dynamodb-table.yml)}
+  - ${file(resources/cognito-user-pool.yml)}
+  - ${file(resources/cognito-identity-pool.yml)}

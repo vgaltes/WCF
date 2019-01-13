@@ -1,0 +1,18 @@
+Resources:
+  MastersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:custom.mastersTable}
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  EnrollMasterEventsStream:
+    Type: AWS::Kinesis::Stream
+    Properties: 
+      Name: ${self:custom.enrollMasterEventsStream}
+      ShardCount: 1
