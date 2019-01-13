@@ -68,4 +68,3 @@ typings/
 
 secrets.yml
 .env
-vars.yml

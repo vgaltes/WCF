@@ -1356,10 +1356,10 @@ De momento nos vamos a centrar en nuestro entorno local y ya haremos pasar la bu
 ```
 defaultVarsStage: dev-user
 vars: ${file(./vars.yml):${opt:stage, self:custom.defaultVarsStage}}
-userPoolId: ${self:custom.vars.userPoolId, env:userPoolId}
+userPoolId: ${env:userPoolId, self:custom.vars.userPoolId}
 ```
 
-Básicamente, estamos cargando el fichero y después estamos definiendo una variable que cojerá el valor del fichero y, en caso de no existir, lo cojerá de las variables de entorno.
+Básicamente, estamos cargando el fichero y después estamos definiendo una variable que cojerá el valor de la variable de entorno y, en caso de no existir, lo cojerá del fichero.
 
 Ya podemos deployar otra vez, e intentar pasar los tests de aceptación. En este caso, el nuevo test no nos pasará, ya que el endpoint nos devolverá un 401. Esto es porque, en el test, no estamos pasando el usuario correctamente. Si te fijas en el fichero `when.js`, verás que, cuando llamámos a la función via http, estamos pasando el idToken, pero no estamos haciendo nada con él. Modifica la función `viaHttp` para que tenga este aspecto:
 ```
@@ -1393,3 +1393,4 @@ async function viaHttp(functionPath, method, idToken) {
 
 Como ves, estamos añadiendo la cabezera de autorización. Vuelve a pasar los tests... y tachán!! Tests en verde! Es hora de hacer un push y mirar como va nuestra build.
 
+La build falla pq el arn que estamos pasando como authorizer no es correcto. Y no es correcto pq la variable userPoolId no está seteada. Aqui tenemos una pequeña "referencia circular", ya que no podremos setearla hasta que no deployemos, y no podemos deployar pq no está setada. Vamos a hacer un poco de trampa (solo un poco) y vamos a crear una variable de entorno llamada `cognitoUserPoolId` con el valor de la user pool de nuestro entorno de pruebas (el que tenemos en el fichero vars.yml).

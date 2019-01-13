@@ -24,7 +24,6 @@ custom:
   enrollMasterEventsStream: enrollMasterEvents-${self:custom.stage}
   defaultVarsStage: dev-user
   vars: ${file(./vars.yml):${opt:stage, self:custom.defaultVarsStage}}
-  userPoolId: ${env:cognitoUserPoolId, self:custom.vars.userPoolId}
  
 functions:
   getMasters:
@@ -50,7 +49,7 @@ functions:
           path: api/master/{id}
           method: get
           authorizer:
-            arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.userPoolId}
+            arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
     environment:
       mastersTable: ${self:custom.mastersTable}
     iamRoleStatements:
