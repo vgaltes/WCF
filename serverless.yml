@@ -32,6 +32,7 @@ functions:
       - http:
           path: api/masters
           method: get
+          cors: true
     environment:
       mastersTable: ${self:custom.mastersTable}
     iamRoleStatements:
@@ -48,6 +49,7 @@ functions:
       - http:
           path: api/master/{id}
           method: get
+          cors: true
           authorizer:
             arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
     environment:
@@ -66,6 +68,7 @@ functions:
       - http:
           path: api/masters
           method: post
+          cors: true
           # authorizer:
           #   arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
     environment:
