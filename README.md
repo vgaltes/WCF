@@ -107,7 +107,7 @@ Ahora ve a tu cuenta de Netlify y clica en `New site from git`. Selecciona GitHu
 Ahora ves a `Deploy settings` y en el apartado `Deploy contexts` clica en `edit settings`. En `Branch deploys` selecciona `Let me add individual branches` y escribe `sit` y clica en `Add branch sit`. Esto hará que cuando pusheemos a sit, se arrancará un nuevo deployment. Por lo tanto, ves a tu repositorio, crea una rama llamda sit, haz un pequeño cambia y haz push a ver que tal.
 
 Para que la web en producción nos funcione nos faltan un par de cosas:
- - Añadir la el parámetro `pufouniversity/prod/epsagonToken` a parameter store con el valor adecuado.
+ - Añadir los parámetros `pufouniversity/prod/epsagonToken` y `pufouniversity/prod/epsagonTokenSecure` a parameter store con el valor adecuado.
  - Llenar la base de datos de datos llamando al script. Para esto, puedes crear un par de scripts extras en el `package.json`:
   ```
   "seedMasters:sit": "node seedMasters.js masters-sit",
