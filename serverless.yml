@@ -66,8 +66,6 @@ functions:
       - http:
           path: api/masters
           method: post
-          # authorizer:
-          #   arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
     environment:
       enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
     iamRoleStatements:
