@@ -66,11 +66,11 @@ functions:
     handler: src/functions/enrollMaster.handler
     events:
       - http:
-          path: api/masters
+          path: api/master
           method: post
           cors: true
-          # authorizer:
-          #   arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
+          authorizer:
+            arn: arn:aws:cognito-idp:#{AWS::Region}:#{AWS::AccountId}:userpool/${self:custom.vars.userPoolId}
     environment:
       enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
     iamRoleStatements:

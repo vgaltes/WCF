@@ -23,7 +23,7 @@ function getRecords(event) {
   return event.Records.map(parsePayload);
 }
 
-function generateEmail(orderId, masterId) {
+function generateEmail(orderId, masterId, userEmail) {
   return {
     Source: emailAddress,
     Destination: { ToAddresses: [emailAddress] },
@@ -32,7 +32,7 @@ function generateEmail(orderId, masterId) {
       Body: {
         Text: {
           Charset: "UTF-8",
-          Data: `User has enrolled to master ${masterId} with order id ${orderId}`
+          Data: `User with email ${userEmail} has enrolled to master ${masterId} with order id ${orderId}`
         }
       },
       Subject: {
@@ -56,12 +56,13 @@ const handler = epsagon.lambdaWrapper(async (event, context) => {
   log.info(`received ${orderPlaced.length} master_enrolled events`);
 
   for (const order of orderPlaced) {
-    const emailParams = generateEmail(order.orderId, order.masterId);
+    const emailParams = generateEmail(order.orderId, order.masterId, order.userEmail);
     await ses.sendEmail(emailParams).promise();
 
     log.info("notified universtity", {
       masterId: order.masterId,
-      orderId: order.orderId
+      orderId: order.orderId,
+      userEmail: order.userEmail
     });
 
     const data = _.clone(order);
@@ -76,7 +77,8 @@ const handler = epsagon.lambdaWrapper(async (event, context) => {
     await kinesis.putRecord(kinesisReq).promise();
     log.info("published 'university_notified' event", {
       masterId: order.masterId,
-      orderId: order.orderId
+      orderId: order.orderId,
+      userEmail: order.userEmail
     });
   }
 

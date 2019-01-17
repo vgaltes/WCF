@@ -11,6 +11,8 @@
     "pretest": "npm run lint",
     "posttest": "npm audit",
     "seedMasters": "node seedMasters.js masters-devmanolete",
+    "seedMasters:sit": "node seedMasters.js masters-sit",
+    "seedMasters:prod": "node seedMasters.js masters-prod",
     "deploy": "serverless deploy --aws-profile serverless-local",
     "deploy:sit": "serverless deploy --stage sit",
     "deploy:prod": "serverless deploy --stage prod"

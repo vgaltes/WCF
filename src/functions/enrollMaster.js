@@ -21,12 +21,15 @@ const handler = epsagon.lambdaWrapper(async (event, context) => {
   const { masterId } = JSON.parse(event.body);
   log.debug(`request body is valid JSON`, { requestBody: event.body });
 
+  const userEmail = event.requestContext.authorizer.claims.email;
+
   const orderId = chance.guid();
-  log.info("enrolling to master", { masterId, orderId });
+  log.info("enrolling to master", { masterId, orderId, userEmail });
 
   const data = {
     orderId,
     masterId,
+    userEmail,
     eventType: "master_enrolled"
   };
 
