@@ -88,7 +88,7 @@ functions:
           arn: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
     environment:
       enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
-      emailAddress: xxxxx@yyyyy.com
+      emailAddress: vgaltes@gmail.com
     iamRoleStatements:
       - Effect: Allow
         Action: 
