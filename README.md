@@ -2,9 +2,9 @@
 
 ## Paso 5 - Autenticación
 
-// TODO: explicación cognito
+Es hora de añadir un poco de seguridad a nuestros endpoints. No queremos que cualquiera se pueda dar de alta en nuestra universidad!! Para hacerlo, vamas a utilizar Cognito, en concreto las Cognito User Pools. Las Cognito user pools se encargan de todo lo relacionado con el alta/logueo/deslogueo de un usario. 
 
-Es hora de añadir un poco de seguridad a nuestros endpoints. No queremos que cualquiera se pueda dar de alta en nuestra universidad!! Para mostrar esto, vamos a introducir un nuevo endpoint que recuperará el detalle de un máster. Empecemos por el test. Crear un archivo llamado `getMasterDetails.spec.js` en la carpeta `tests` con el siguiente contenido:
+Para mostrar como funciona, vamos a introducir un nuevo endpoint que recuperará el detalle de un máster. Empecemos por el test. Crear un archivo llamado `getMasterDetails.spec.js` en la carpeta `tests` con el siguiente contenido:
 ```
 const when = require("./steps/when");
 const given = require("./steps/given");
@@ -200,93 +200,12 @@ Outputs:
 
 ```
 
-Y ahora nos toca crear la identity pool. Crea un archivo en esa misma carpeta llamado `cognito-identity-pool-yml` con el siguiente contenido:
-```
-Resources:
-  # The federated identity for our user pool to auth with
-  CognitoIdentityPool:
-    Type: AWS::Cognito::IdentityPool
-    Properties:
-      # Generate a name based on the stage
-      IdentityPoolName: ${self:custom.stage}IdentityPool
-      # Don't allow unathenticated users
-      AllowUnauthenticatedIdentities: false
-      # Link to our User Pool
-      CognitoIdentityProviders:
-        - ClientId:
-            Ref: CognitoUserPoolClient
-          ProviderName:
-            Fn::GetAtt: ["CognitoUserPool", "ProviderName"]
-
-  # IAM roles
-  CognitoIdentityPoolRoles:
-    Type: AWS::Cognito::IdentityPoolRoleAttachment
-    Properties:
-      IdentityPoolId:
-        Ref: CognitoIdentityPool
-      Roles:
-        authenticated:
-          Fn::GetAtt: [CognitoAuthRole, Arn]
-
-  # IAM role used for authenticated users
-  CognitoAuthRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Federated: "cognito-identity.amazonaws.com"
-            Action:
-              - "sts:AssumeRoleWithWebIdentity"
-            Condition:
-              StringEquals:
-                "cognito-identity.amazonaws.com:aud":
-                  Ref: CognitoIdentityPool
-              "ForAnyValue:StringLike":
-                "cognito-identity.amazonaws.com:amr": authenticated
-      Policies:
-        - PolicyName: "CognitoAuthorizedPolicy"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "mobileanalytics:PutEvents"
-                  - "cognito-sync:*"
-                  - "cognito-identity:*"
-                Resource: "*"
-
-              # Allow users to invoke our API
-              - Effect: "Allow"
-                Action:
-                  - "execute-api:Invoke"
-                Resource:
-                  Fn::Join:
-                    - ""
-                    - - "arn:aws:execute-api:"
-                      - Ref: AWS::Region
-                      - ":"
-                      - Ref: AWS::AccountId
-                      - ":"
-                      - Ref: ApiGatewayRestApi
-                      - "/*"
-
-# Print out the Id of the Identity Pool that is created
-Outputs:
-  IdentityPoolId:
-    Value:
-      Ref: CognitoIdentityPool
-```
-
 Ya lo tenemos. Es hora de deployar porque vamos a necesitar esos ids que antes hablábamos y no los vamos a tener hasta que no deployemos:
 ```
 SLSUSER=manolete npm run deploy
 ```
 
-Ahora toca recuperar los ids, y para ello tendremos que ir a la consola. Ve al servicio cognito y selecciona el user pool recién creado. En esa página verás el id, cópiatelo. En esta misma página, en la sección App integration -> App client settings podrás recuperar el cognito server client id. Y finalmente, si vuelves al servicio cognito y seleccionas el identity pool, si le clicas sobre el botón de edit podrás recuperar el id del identiy pool.
+Ahora toca recuperar los ids, y para ello tendremos que ir a la consola. Ve al servicio cognito y selecciona el user pool recién creada. En esa página verás el id, cópiatelo. En esta misma página, en la sección App integration -> App client settings podrás recuperar el cognito server client id. 
 
 Ya estamos un poco más cerca de poder lanzar los tests, nos falta poder setear estos valores como variables de entorno. Para hacerlo, utilizaremos un fichero .env. Hay que tener en cuenta que no queremos subir este fichero al repositorio, así que edita el fichero `.gitignore` y añade el fichero `.env`. Para cargar este fichero utilizaremos una libreria llamada dotnev. Ve a tu terminal y añádela al proyecto como dev dependency.
 ```
@@ -296,7 +215,6 @@ npm install dotenv --save-dev
 Crea un fichero llamado `.env` en la raiz de tu proyecto y añade los ids que acabamos de recuperar. Tu fichero debería tener esta pinta:
 ```
 cognitoUserPoolId=eu-west-1_XXXXXXXX
-identityPoolId=eu-west-1:XXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXX
 cognitoServerClientId=XXXXXXXXXXXXXXXXXXXXX
 ```
 

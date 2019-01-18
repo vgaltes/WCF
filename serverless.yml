@@ -100,4 +100,3 @@ functions:
 resources:
   - ${file(resources/masters-dynamodb-table.yml)}
   - ${file(resources/cognito-user-pool.yml)}
-  - ${file(resources/cognito-identity-pool.yml)}
