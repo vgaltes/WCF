@@ -1,6 +1,8 @@
 # NO ME PUEDO CREER QUE PUEDA HACER UNA APLICACIÓN SERVERLESS EN DOS HORAS
 
-Hola, bienvenido a este workshop sobre Serverless. Antes de empezar necesitaria que configuraras unas cuantas cosas en tu ordenador. Debes hacer esto antes de venir al workshop por dos razones:
+Hola, bienvenido a este workshop sobre Serverless en AWS. El objetivo de este workshop es darte las herramientas necesarias para que si vas a empezar en breve un proyecto Serverless, lo hagas de una manera séria y profesional. Veremos cosas como testing, seguridad, logging, monitorización, integración contínua, etc.
+
+Antes de empezar necesitaria que configuraras unas cuantas cosas en tu ordenador. Debes hacer esto **antes** de venir al workshop por dos razones:
  - No perder el tiempo en los preparativos durante el workshop y así sacar el máximo provecho de él.
  - Algunas cuentas pueden tardar unas horas en activarse. Si lo haces al principio del workshop puede ser que no tengas la cuenta activa durante el mismo.
 
@@ -15,6 +17,14 @@ Vamos a necesitar un par de usuarios en tu cuenta para el workshop. Uno será el
  - Visualiza y copia la API Key y el Secret a un lugar temporal. Lo necesitaremos más tarde.
 
 Esto no es una buena práctica. La buena práctica sería dar los mínimos permisos posibles a este usuario (y a todos). Para hacerlo, crearíamos una policy en la que especificaríamos los mínimos permisos (algo como lo que puedes encontrar [aqui](https://gist.githubusercontent.com/ServerlessBot/7618156b8671840a539f405dea2704c8/raw/bfc213d5b20ad0192217d5035ff526792535bdab/IAMCredentials.json)) y asiganaríamos esa policy al usurio. Cada vez que viéramos que nos falta un permiso, deberíamos cambiar la policy. Para no tener que ir haciendo esto cada dos por tres, asignamos el usuario al grupo Administrators, pero no debéis hacer esto en un proyecto en producción. Hay herramientas que nos pueden ayudar como [esta](https://www.trek10.com/blog/excess-access-exorcism-with-aws-config/) o [esta](https://github.com/dancrumb/generator-serverless-policy).
+
+## Cómo avanzar en este workshop
+Para poder ir avanzando en el workshop, vas a tener que ser capaz de ir subiendo tus cambios al repositorio a medida que vayamos avanzando para que el sistema de integración contínua pueda hacer su trabajo. Por lo tanto, puedes hacer tres cosas:
+ - Clonar este repositorio y trabajar siempre en master. Haz tus cambios en master y súbelos. Si necesitas ver como está un archivo en una rama en concreto, siempre puedes venir al [repositorio original](https://github.com/vgaltes/wcf) y mirar como está.
+ - Forkear este repositorio y trabajar siempre en master. Haz tus cambios en master y súbelos. Si necesitas ver como está un archivo en una rama en concreto, siempre puedes venir al [repositorio original](https://github.com/vgaltes/wcf) y mirar como está.
+ - Crearte tu propio repositorio vacío y copiarte los ficheros que hay en master.
+ 
+Cualquiera de las tres opciones es buena. Sólo recuerda que si escoges la solución 1 o 2, si vas a una rama, tendrás la solución final para esa rama.
 
 ## Creación de un profile en nuestro ordenador.
 Ahora es la hora de configurar nuestro ordenador para que utilice estas credenciales a la hora de desplegar nuestra aplicación. Hay varias maneras de hacer esto pero la mejor es utilizar un profile y que este no sea el profile por defecto, para evitar posibles desgracias en el futuro.
