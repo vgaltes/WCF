@@ -11,7 +11,7 @@ Vamos a utilizar AWS Lambda, así que necesitas tener una cuenta en AWS. No te p
 
 Vamos a necesitar un par de usuarios en tu cuenta para el workshop. Uno será el que utilizaremos en local para desplegar y probar la aplicación. El segundo será el que utilizará nuestro sistema de integración contínua para desplegar y probar la aplicación. Vamos a por ello: repite los siguientes pasos dos veces (una por usuario) con diferentes nombres de usuario.
  - Haz login en tu cuenta de AWS y ve a la página Identity & Access Management (IAM)
- - Haz click en Users y después en Add User. Introduce serverless-local como nombre para el primer usuario y serverless-agent como nombre para el segundo usuario. Activa Programmatic Access. Haz click en Next para ir a la página de permisos. Haz click en Add user to group y selecciona el grupo Administrators.
+ - Haz click en Users y después en Add User. Introduce `serverless-local` como nombre para el primer usuario y `serverless-agent` como nombre para el segundo usuario. Activa Programmatic Access. Haz click en Next para ir a la página de permisos. Haz click en Attach existing policies directly y selecciona la policy llamada AdministratorAccess (la primera).
  - Clica en Next: tags. 
  - Clica en Next: review. Chequea que todo está bien y clica en Create user. 
  - Visualiza y copia la API Key y el Secret a un lugar temporal. Lo necesitaremos más tarde.
