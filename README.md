@@ -123,7 +123,20 @@ Lo primero que vamos a intentar es tener el test de integración en verde. Anter
 npm run test:integration
 ```
 
-Efectivamente, el error es diferente. Vamos mejorando. Lo que vamos a querer, es recuperar los masters de una base de datos. Para ello vamos autilizar DynamoDB con la nueva característica que tiene de pago por uso. Y para definirla, vamos a incorporar una nueva sección al fichero `serverless.yml` que es la de los recursos. El framework nos permite definir recursos de CloudFormation directamente en el fichero, de manera que serán deployados cuando deployemos el servicio entero. Vamos a definir nuestra tabla de DynamoDb. Añade esto al final del fichero `serverless.yml`:
+Efectivamente, el error es diferente. Vamos mejorando. Lo que pasa es que el test fallará porque tenemos una implementación un tanto sucia del primer ejemplo. Cambia el contenido del fichero por este:
+```
+module.exports.handler = async event => {
+  const res = {
+    statusCode: 200,
+    body: JSON.stringify(`Hello`)
+  };
+
+  return res;
+};
+```
+Esto hará que los tests no fallen porque no encuentran el parámetro name.
+
+Lo que vamos a querer ahora, es recuperar los masters de una base de datos. Para ello vamos autilizar DynamoDB con la nueva característica que tiene de pago por uso. Y para definirla, vamos a incorporar una nueva sección al fichero `serverless.yml` que es la de los recursos. El framework nos permite definir recursos de CloudFormation directamente en el fichero, de manera que serán deployados cuando deployemos el servicio entero. Vamos a definir nuestra tabla de DynamoDb. Añade esto al final del fichero `serverless.yml`:
 
 ```
 resources:
@@ -195,7 +208,7 @@ module.exports.init = () => {
 };
 ```
 
-Aquí aplica lo mismo que antes. Podemos quitar la línea donde seteamos la variable `mastersTable` y dejar que cada usuario la setee al llamar a los tests. Por ahora nos vale esto a nosotros.
+Aquí aplica lo mismo que antes. Podemos quitar la línea donde seteamos la variable `mastersTable` y dejar que cada usuario la setee al llamar a los tests. Por ahora nos vale esto a nosotros, así que lo podemos dejar de esta manera.
 
 Ahora tenemos que cambiar un poco nuestro test. Añade este require:
 ```
