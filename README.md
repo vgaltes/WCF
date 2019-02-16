@@ -32,7 +32,7 @@ Cualquiera de las tres opciones es buena. Sólo recuerda que si escoges la soluc
 ## Creación de un profile en nuestro ordenador.
 Ahora es la hora de configurar nuestro ordenador para que utilice estas credenciales a la hora de desplegar nuestra aplicación. Hay varias maneras de hacer esto pero la mejor es utilizar un profile y que este no sea el profile por defecto, para evitar posibles desgracias en el futuro.
 
-Para setear este profile hay varias maneras, pero la más cómoda es utilizar el propio [Serverless framework](https://serverless.com). Así que clona o "forkea" este repositorio e instala los paquetes npm utilizando el comando `npm install`. Una vez instalados, ejecuta el siguiente comando: `./node_modules/.bin/serverless config credentials --provider aws --key <tu_key> --secret <tu_secret> --profile serverless-local`
+Para setear este profile hay varias maneras, pero la más cómoda es utilizar el propio [Serverless framework](https://serverless.com). Así que clona o "forkea" este repositorio e instala los paquetes npm utilizando el comando `npm install`. Una vez instalados, ejecuta el siguiente comando: `npx serverless config credentials --provider aws --key <tu_key> --secret <tu_secret> --profile serverless-local`
 
 Dónde `tu_key` y `tu_secret` son los datos que nos hemos guardado del paso anterior para el usuario serverless-local. Las claves para el usuario serverless-agent las utilizaremos más tarde, así que guárdalas bien. Con esto ya tendremos el profile creado.
 
