@@ -14,7 +14,8 @@ custom:
   defaultRegion: eu-west-1
   stage: ${opt:stage, self:provider.stage}
   mastersTable: masters-${self:custom.stage}
-  enrollMasterEventsStream: enrollMasterEvents-${self:custom.stage}
+  enrolMasterSnsTopicName: enrollMasterEvents-${self:custom.stage}
+  enrolMasterSnsTopic: arn:aws:sns:#{AWS::Region}:#{AWS::AccountId}:${self:custom.enrolMasterSnsTopicName}
  
 functions:
   getMasters:
@@ -37,19 +38,17 @@ functions:
           path: api/masters
           method: post
     environment:
-      enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
+      enrollMasterSnsTopic: ${self:custom.enrolMasterSnsTopic}
     iamRoleStatements:
       - Effect: Allow
-        Action: kinesis:PutRecord
-        Resource: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
+        Action: sns:Publish
+        Resource: ${self:custom.enrolMasterSnsTopic}
 
   notifyUniversity:
     handler: src/functions/notifyUniversity.handler
     events:
-      - stream:
-          arn: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
+      - sns: ${self:custom.enrolMasterSnsTopicName}
     environment:
-      enrollMasterEventsStream: ${self:custom.enrollMasterEventsStream}
       emailAddress: xxxx@yyyy.com
     iamRoleStatements:
       - Effect: Allow
@@ -57,9 +56,6 @@ functions:
           - ses:SendEmail
           - ses:SendRawEmail
         Resource: "*"
-      - Effect: Allow
-        Action: kinesis:PutRecord
-        Resource: arn:aws:kinesis:#{AWS::Region}:#{AWS::AccountId}:stream/${self:custom.enrollMasterEventsStream}
 
 resources:
   Resources:
@@ -75,8 +71,8 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
-    EnrollMasterEventsStream:
-      Type: AWS::Kinesis::Stream
-      Properties: 
-        Name: ${self:custom.enrollMasterEventsStream}
-        ShardCount: 1
+    # EnrollMasterEventsStream:
+    #   Type: AWS::Kinesis::Stream
+    #   Properties: 
+    #     Name: ${self:custom.enrollMasterEventsStream}
+    #     ShardCount: 1
