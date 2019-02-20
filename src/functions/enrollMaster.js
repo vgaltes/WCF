@@ -5,9 +5,8 @@ const epsagon = require("epsagon");
 const middy = require("middy");
 const { ssm } = require("middy/middlewares");
 const log = require("../lib/log");
+const sns = new AWS.SNS();
 
-const kinesis = new AWS.Kinesis();
-const eventStream = process.env.enrollMasterEventsStream;
 const { stage } = process.env;
 
 const handler = epsagon.lambdaWrapper(async (event, context) => {
@@ -17,7 +16,6 @@ const handler = epsagon.lambdaWrapper(async (event, context) => {
     metadataOnly: false
   });
 
-  console.log(event.body);
   const { masterId } = JSON.parse(event.body);
   log.debug(`request body is valid JSON`, { requestBody: event.body });
 
@@ -26,17 +24,15 @@ const handler = epsagon.lambdaWrapper(async (event, context) => {
 
   const data = {
     orderId,
-    masterId,
-    eventType: "master_enrolled"
+    masterId
   };
 
-  const req = {
-    Data: JSON.stringify(data), // the SDK would base64 encode this for us
-    PartitionKey: orderId,
-    StreamName: eventStream
+  const params = {
+    Message: JSON.stringify(data),
+    TopicArn: process.env.enrollMasterSnsTopic
   };
 
-  await kinesis.putRecord(req).promise();
+  await sns.publish(params).promise();
 
   log.info("published 'master_enrolled' event", { masterId, orderId });
 

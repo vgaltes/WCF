@@ -9,19 +9,8 @@ const { ssm } = require("middy/middlewares");
 const log = require("../lib/log");
 
 const ses = new AWS.SES();
-const kinesis = new AWS.Kinesis();
-const eventStream = process.env.enrollMasterEventsStream;
 const { emailAddress } = process.env;
 const { stage } = process.env;
-
-function parsePayload(record) {
-  const json = Buffer.from(record.kinesis.data, "base64").toString("utf8");
-  return JSON.parse(json);
-}
-
-function getRecords(event) {
-  return event.Records.map(parsePayload);
-}
 
 function generateEmail(orderId, masterId) {
   return {
@@ -50,35 +39,16 @@ const handler = epsagon.lambdaWrapper(async (event, context) => {
     metadataOnly: false
   });
 
-  const records = getRecords(event);
-  const orderPlaced = records.filter(r => r.eventType === "master_enrolled");
+  const orderPlaced = JSON.parse(event.Records[0].Sns.Message);
+  log.info("Recieved order placed event", orderPlaced);
 
-  log.info(`received ${orderPlaced.length} master_enrolled events`);
+  const emailParams = generateEmail(orderPlaced.orderId, orderPlaced.masterId);
+  await ses.sendEmail(emailParams).promise();
 
-  for (const order of orderPlaced) {
-    const emailParams = generateEmail(order.orderId, order.masterId);
-    await ses.sendEmail(emailParams).promise();
-
-    log.info("notified universtity", {
-      masterId: order.masterId,
-      orderId: order.orderId
-    });
-
-    const data = _.clone(order);
-    data.eventType = "university_notified";
-
-    const kinesisReq = {
-      Data: JSON.stringify(data), // the SDK would base64 encode this for us
-      PartitionKey: order.orderId,
-      StreamName: eventStream
-    };
-
-    await kinesis.putRecord(kinesisReq).promise();
-    log.info("published 'university_notified' event", {
-      masterId: order.masterId,
-      orderId: order.orderId
-    });
-  }
+  log.info("notified universtity", {
+    masterId: orderPlaced.masterId,
+    orderId: orderPlaced.orderId
+  });
 
   return "all done";
 });
