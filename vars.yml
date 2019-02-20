@@ -4,4 +4,4 @@ dev-user:
 sit:
   userPoolId: "eu-west-1_lGUbdNBYr"
 prod:
-  userPoolId: "eu-west-1_9FCvzfhnI"
+  userPoolId: "eu-west-1_sfduMow6n"
