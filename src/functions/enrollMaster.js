@@ -3,7 +3,6 @@ const chance = require("chance").Chance();
 const sns = new AWS.SNS();
 
 module.exports.handler = async event => {
-  console.log(event.body);
   const { masterId } = JSON.parse(event.body);
 
   const orderId = chance.guid();
@@ -21,7 +20,7 @@ module.exports.handler = async event => {
 
   await sns.publish(params).promise();
 
-  console.log(`published 'master_enrolled' event into Kinesis`);
+  console.log(`published 'master_enrolled' event into SNS`);
 
   const response = {
     statusCode: 200,
