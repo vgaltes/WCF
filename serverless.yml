@@ -82,7 +82,7 @@ functions:
     events:
       - sns: ${self:custom.enrolMasterSnsTopicName}
     environment:
-      emailAddress: vgaltes@gmail.com
+      emailAddress: XXXX@YYYY.com
     iamRoleStatements:
       - Effect: Allow
         Action: 
