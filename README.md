@@ -85,7 +85,7 @@ Así que ve a la consola de AWS, selecciona el servicio EC2, y en el menú de la
 
 Ahora vamos a nuestro fichero `serverless.yml` y cambiamos la línea donde seteábamos la variable de entorno del token por la siguiente:
 ```
-c: ${ssm:/pufouniversity/${self:custom.stage}/epsagonToken}
+epsagonToken: ${ssm:/pufouniversity/${self:custom.stage}/epsagonToken}
 ```
 
 Deploya y todo debería seguir funcionando. 
