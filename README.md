@@ -149,12 +149,6 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
-
-  EnrollMasterEventsStream:
-    Type: AWS::Kinesis::Stream
-    Properties: 
-      Name: ${self:custom.enrollMasterEventsStream}
-      ShardCount: 1
 ```
 
 Y en el archivo `serverless.yml` reemplazar la definición de la tabla, por la carga de este archivo:
@@ -254,7 +248,7 @@ Volvemos a pasar los tests de aceptación:
 TEST_BASE_URL='https://xxxxxxxx.execute-api.eu-west-1.amazonaws.com/devmanolete/api' AWS_PROFILE=serverless-local npm run test:acceptance
 ```
 
-y vemos que el test está en verde! Genial, no? Bueno, no del todo. Resulta que hemos deployado el endpoint sin autenticación, así que estamos haciendo un poco de trampa. Vamos a añadir-le autenticación. Edita el fichero `serverless.yml` y, en la función de `getMasterDetails` añade el authorizer en la definición del evento:
+y vemos que el test está en verde! Genial, no? Bueno, no del todo. Resulta que hemos deployado el endpoint sin autenticación, así que estamos haciendo un poco de trampa. Vamos a añadirle autenticación. Edita el fichero `serverless.yml` y, en la función de `getMasterDetails` añade el authorizer en la definición del evento:
 ```
 events:
   - http:
@@ -267,7 +261,7 @@ events:
 Sólo nos queda cargar correctamente la variable userPoolId. Crea un archivo llamado `vars.yml` en la raiz de tu proyecto con este contenido:
 ```
 dev-user:
-  userPoolId: "eu-west-1_VTdZAauUw"
+  userPoolId: "<tu_user_pool_id>"
 sit:
   userPoolId: ""
 prod:
