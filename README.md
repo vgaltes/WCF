@@ -4,7 +4,7 @@
 
 Es hora de poner un cliente web a charlar con nuestro serverless backend. Aunque primero vamos a hacer unos pequeñísimos cambios.
 
-Lo que queremos hacer antes de ponernos con el cliente es a) securizar el endpoint enrolMaster, b) utilzar el correo del usuario logueado en el mail que enviamos y en los mensajes de kinesis y c) activar CORS para que el cliente pueda acceder al backend. Vamos a por ello.
+Lo que queremos hacer antes de ponernos con el cliente es a) securizar el endpoint enrolMaster, b) utilzar el correo del usuario logueado en el mail que enviamos y en los mensajes de SNS y c) activar CORS para que el cliente pueda acceder al backend. Vamos a por ello.
 
 Lo primero que vamos a hacer es securizar el endpont enrolMaster. Edita el fichero `serverless.yml` y ve al evento http de la función enrolMaster. Añádele el authorizer y de paso le cambias un poco el path para sacarle la s extra. Te debería quedar algo así:
 ```

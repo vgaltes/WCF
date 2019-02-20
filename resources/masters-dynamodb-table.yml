@@ -10,9 +10,3 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
-
-  EnrollMasterEventsStream:
-    Type: AWS::Kinesis::Stream
-    Properties: 
-      Name: ${self:custom.enrollMasterEventsStream}
-      ShardCount: 1
