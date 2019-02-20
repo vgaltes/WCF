@@ -25,20 +25,19 @@ const userEmail = event.requestContext.authorizer.claims.email;
 
 Como ves, la información de cognito nos viene dentro del evento.
 
-Ahora ya podemos utilizar este mail. Si quieres puedes cambiar las líneas de logging para añadirlo (cuidado con esto en producción ya que no podemos loguear PII), pero lo más importante es que lo añadas al evento de Kinesis:
+Ahora ya podemos utilizar este mail. Si quieres puedes cambiar las líneas de logging para añadirlo (cuidado con esto en producción ya que no podemos loguear PII), pero lo más importante es que lo añadas al evento de SNS:
 ```
 const data = {
   orderId,
    masterId,
-   userEmail,
-   eventType: "master_enrolled"
+   userEmail
 };
 
 ```
 
 Ya que lo estamos enviando, lo tendremos que recuperar para añadirlo al mail que enviamos a la universidad. Edita el fichero `src/function/notifyUniversity.js`. Edita la primera línea del for para que te quede algo como esto:
 ```
-const emailParams = generateEmail(order.orderId, order.masterId, order.userEmail);
+const emailParams = generateEmail(orderPlaced.orderId, orderPlaced.masterId, orderPlaced.userEmail);
 ```
 
 y cambia la función `generateEmail` para utilizar el correo:
