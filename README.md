@@ -64,6 +64,11 @@ module.exports.handler = async event => {
 
 Lo que estamos haciendo es capturar la variable masterId que el usuario nos pasará en el body de la petición, crear un nuevo guid con la librería `chance` y crear e insertar un evento en SNS. Al usuario le devolvemos el `orderId`.
 
+Nos tocará incluir la librería `chance` en el proyecto:
+```
+npm install chance --save
+```
+
 Podemos deployar esto 
 ```
 SLSUSER=manolete npm run deploy
@@ -76,7 +81,7 @@ y hacer una petición post con nuestra herramienta favorita con un body como est
 }
 ```
 
-La petición debería ser satisfactoria y deberíamos recibir el orderId como respuesta.
+La petición todavía no debería ser satisfactoria porque el topic SNS no estará todavía creado. Lo crearemos con el siguiente endpoint.
 
 Vamos ahora a enviar el correo a la universidad. Lo primero que necesitamos hacer es especificarle a SES una dirección verificada. Ve al a consola de AWS y selecciona el servicio `Simple Email Service`. En el menú de la izquierda, selecciona `Email Addresses` en la sección Identity Managemnt. Clica en `Verify a New Email Address` e introduce tu dirección de correo. Recibirás allí un correo con un link para verificarlo, haz clic en el link.
 
@@ -98,7 +103,7 @@ notifyUniversity:
       Resource: "*"
 ```
 
-La gran novedad aquí es que no será una función llamada via HTTP, sinó que será llamada por un mensaje en un stream. En cuanto a los permisos, necesitamos permiso para enviar el correo y para poner un nuevo mensaje en el stream para indicar que hemos enviado la notificación. Vamos a ver pues el código de la función:
+La gran novedad aquí es que no será una función llamada via HTTP, sinó que será llamada por un mensaje en un stream. En cuanto a los permisos, necesitamos permiso para enviar el correo. Vamos a ver pues el código de la función:
 ```
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
