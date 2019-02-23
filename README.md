@@ -22,8 +22,7 @@ Esto no es una buena práctica. La buena práctica sería dar los mínimos permi
 En el paso 4 vamos a utilizar una herramienta de monitorización llamada Epsagon. Tendrías que prepararla para que todo nos vaya fluido. Ve a su [página web](https://epsagon.com/) y date de alta en el servicio gratuito. Cuando te des de alta, te explicarán lo que tienes que hacer. Básicamente deberás desplegar un CloudFormation en tu cuenta AWS y anotarte el Token que utilizaremos después.
 
 ## Cómo avanzar en este workshop
-Para poder ir avanzando en el workshop, vas a tener que ser capaz de ir subiendo tus cambios al repositorio a medida que vayamos avanzando para que el sistema de integración contínua pueda hacer su trabajo. Por lo tanto, puedes hacer tres cosas:
- - Clonar este repositorio y trabajar siempre en master. Haz tus cambios en master y súbelos. Si necesitas ver como está un archivo en una rama en concreto, siempre puedes venir al [repositorio original](https://github.com/vgaltes/wcf) y mirar como está.
+Para poder ir avanzando en el workshop, vas a tener que ser capaz de ir subiendo tus cambios al repositorio a medida que vayamos avanzando para que el sistema de integración contínua pueda hacer su trabajo. Por lo tanto, puedes hacer dos cosas:
  - Forkear este repositorio y trabajar siempre en master. Haz tus cambios en master y súbelos. Si necesitas ver como está un archivo en una rama en concreto, siempre puedes venir al [repositorio original](https://github.com/vgaltes/wcf) y mirar como está.
  - Crearte tu propio repositorio vacío y copiarte los ficheros que hay en master.
  
